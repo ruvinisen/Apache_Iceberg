@@ -23,7 +23,18 @@ Seek to implement data versioning and rollback capabilities for auditing and err
 
 # Apache Iceberg Spark Integration Setup
 
-This guide details how to set up the Apache Iceberg runtime JAR for use with Apache Spark.
+This guide details how to set up the Apache Iceberg runtime JAR for use with Apache Spark. 
+
+# Apache Iceberg with PySpark and Hive Metastore
+
+This guide demonstrates how to set up and use Apache Iceberg with PySpark and Hive Metastore, including:
+
+- Catalog configuration
+- Table creation
+- Partitioning
+- Time travel
+- Schema evolution
+- Metadata inspection
 
 ## Prerequisites
 
@@ -54,3 +65,10 @@ chmod 644 /home/hadoop/spark/jars/iceberg-spark-runtime-3.3_2.12-1.4.2.jar
 ```bash
 cd ~/spark/bin
 ```
+
+
+
+
+
+
+
