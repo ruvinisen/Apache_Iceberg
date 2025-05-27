@@ -1,4 +1,4 @@
-Here is what you can do in iceberg
+Here is what you can do in pyspark with iceberg
 
 ### Navigate to Spark binary directory (optional)
 ```bash
@@ -23,6 +23,7 @@ spark = SparkSession.builder \
 .enableHiveSupport() \
 .getOrCreate()
 ```
+```bash
 >>> spark.sql("SHOW DATABASES IN my_hive").show()
 +---------+
 |namespace|
@@ -30,8 +31,13 @@ spark = SparkSession.builder \
 |  default|
 +---------+
 
+```
+```bash
+
 >>> spark.sql("CREATE DATABASE my_hive.new_iceberg_db")
 DataFrame[]
+```
+```bash
 >>> spark.sql("SHOW DATABASES IN my_hive").show()
 +--------------+
 |     namespace|
@@ -39,7 +45,8 @@ DataFrame[]
 |       default|
 |new_iceberg_db|
 +--------------+
-
+```
+```bash
 >>> spark.sql("""
 CREATE TABLE my_hive.new_iceberg_db.my_table_1 (
    id INT,
@@ -49,12 +56,16 @@ CREATE TABLE my_hive.new_iceberg_db.my_table_1 (
  USING iceberg
  """)
 DataFrame[]
+```
+```bash
 >>> spark.sql("""
 INSERT INTO my_hive.new_iceberg_db.my_table_1 VALUES
 (1, 'Alice', TIMESTAMP '2025-05-20 11:00:00'),
  (2, 'Bob', TIMESTAMP '2025-05-20 11:10:00')
  """)
-DataFrame[]                                                                     
+DataFrame[]
+```
+```bash                                                                  
 >>> spark.sql("SELECT * FROM my_hive.new_iceberg_db.my_table_1").show()
 +---+-----+-------------------+                                                 
 | id| name|         created_at|
@@ -62,60 +73,66 @@ DataFrame[]
 |  1|Alice|2025-05-20 11:00:00|
 |  2|  Bob|2025-05-20 11:10:00|
 +---+-----+-------------------+
-
+```
+```bash
 >>> spark.sql("""
-... CREATE TABLE my_hive.new_iceberg_db.partitioned_table (
-...     id INT,
-...     name STRING,
-...     created_at TIMESTAMP
-... )
-... USING iceberg
-... PARTITIONED BY (days(created_at))
-... """)
-
+CREATE TABLE my_hive.new_iceberg_db.partitioned_table (
+     id INT,
+   name STRING,
+    created_at TIMESTAMP
+ )
+ USING iceberg
+ PARTITIONED BY (days(created_at))
+ """)
+```
+```bash
 >>> spark.sql("""
-... INSERT INTO my_hive.new_iceberg_db.partitioned_table VALUES
-... (1, 'Alice', TIMESTAMP '2025-05-20 09:00:00'),
-... (2, 'Bob', TIMESTAMP '2025-05-21 10:30:00')
-... """)
+ INSERT INTO my_hive.new_iceberg_db.partitioned_table VALUES
+ (1, 'Alice', TIMESTAMP '2025-05-20 09:00:00'),
+ (2, 'Bob', TIMESTAMP '2025-05-21 10:30:00')
+ """)
 25/05/20 11:39:31 WARN SparkWriteBuilder: Skipping distribution/ordering: extensions are disabled and spec contains unsupported transforms
-DataFrame[]                                                   
-                  
+DataFrame[]
+```                                                
+```bash                  
 >>> spark.sql("SELECT * FROM my_hive.new_iceberg_db.partitioned_table.snapshots").show()
 +--------------------+-------------------+---------+---------+--------------------+--------------------+
 |        committed_at|        snapshot_id|parent_id|operation|       manifest_list|             summary|
 +--------------------+-------------------+---------+---------+--------------------+--------------------+
 |2025-05-20 11:39:...|4198847565748285814|     null|   append|hdfs://localhost:...|{spark.app.id -> ...|
 +--------------------+-------------------+---------+---------+--------------------+--------------------+
-
+```
+```bash
 >>> spark.sql("""
-... SELECT * FROM my_hive.new_iceberg_db.partitioned_table 
-... VERSION AS OF 4198847565748285814
-... """).show()
+SELECT * FROM my_hive.new_iceberg_db.partitioned_table 
+ VERSION AS OF 4198847565748285814
+ """).show()
 +---+-----+-------------------+
 | id| name|         created_at|
 +---+-----+-------------------+
 |  1|Alice|2025-05-20 09:00:00|
 |  2|  Bob|2025-05-21 10:30:00|
 +---+-----+-------------------+
-
+```
+```bash
 >>> spark.sql("""
-... ALTER TABLE my_hive.new_iceberg_db.partitioned_table
-... ADD COLUMN email STRING
-... """)
+ ALTER TABLE my_hive.new_iceberg_db.partitioned_table
+ ADD COLUMN email STRING
+ """)
 25/05/20 11:42:24 WARN BaseTransaction: Failed to load metadata for a committed snapshot, skipping clean-up
 DataFrame[]
-
-
+```
+```bash
 
 >>> spark.sql("""
-... ALTER TABLE my_hive.new_iceberg_db.partitioned_table
-... DROP COLUMN email
-... """)
-
+ ALTER TABLE my_hive.new_iceberg_db.partitioned_table
+ DROP COLUMN email
+ """)
+```
 
 
 ✅ Option 1: Use SQL to Describe the Table
+```bash
 This shows the columns, data types, partition info, and mor
 >>> spark.sql("DESCRIBE EXTENDED my_hive.new_iceberg_db.partitioned_table").show(truncate=False)
 -------------------+-------+
@@ -140,6 +157,7 @@ This shows the columns, data types, partition info, and mor
 |Owner                       |hadoop                                                                                                                |       |
 |Table Properties            |[current-snapshot-id=4198847565748285814,format=iceberg/parquet,format-version=2,write.parquet.compression-codec=zstd]|       |
 +----------------------------+----------------------------------------------------------------------------------------------------------------------+-------+
+```
 This will give output including:
 	Schema
 	Partitioning
@@ -149,8 +167,10 @@ This will give output including:
 
 
 ✅ Option 2: Use table_properties Metadata Table
+```bash
 Iceberg exposes metadata tables to inspect internals.
 >>> spark.sql("SELECT * FROM my_hive.new_iceberg_db.partitioned_table.table_properties").show()
+```
 Other useful metadata tables:
 	snapshots
 	history
@@ -159,6 +179,7 @@ Other useful metadata tables:
 	partitions
 
 ✅ Option 3: View All Tables and Properties in the Database
+```bash
 >>> spark.sql("SHOW TABLES IN my_hive.new_iceberg_db").show()
 +--------------+-----------------+-----------+
 |     namespace|        tableName|isTemporary|
@@ -166,27 +187,29 @@ Other useful metadata tables:
 |new_iceberg_db|         my_table|      false|
 |new_iceberg_db|partitioned_table|      false|
 +--------------+-----------------+-----------+
-
+```
 
 ✅ Step 1: List all catalogs (optional)
-
+```bash
 spark.sql("SHOW CATALOGS").show()
 You may see catalogs like:
 	spark_catalog
 	my_hive (Iceberg with Hive)
 	my_catalog (Iceberg with Hadoop)
-
+```
+```bash
 >>> spark.sql("SHOW CATALOGS").show()
 +-------+
 |catalog|
 +-------+
 |my_hive| 
 
-
+```
 ✅ Step 2: For each catalog, list all databases
-You can loop over and inspect them manually:
-spark.sql("SHOW DATABASES IN my_hive").show()
 
+You can loop over and inspect them manually:
+
+```bash
 >>> spark.sql("SHOW DATABASES IN my_hive").show()
 +--------------+
 |     namespace|
@@ -194,3 +217,4 @@ spark.sql("SHOW DATABASES IN my_hive").show()
 |       default|
 |new_iceberg_db|
 +--------------+
+```
