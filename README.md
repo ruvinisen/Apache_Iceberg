@@ -19,3 +19,38 @@ Require robust data governance and compliance features, such as GDPR adherence.
 Need to perform incremental data processing or manage slowly changing dimensions.
 Operate in environments with multiple data processing engines accessing shared datasets.
 Seek to implement data versioning and rollback capabilities for auditing and error correction. 
+
+
+# Apache Iceberg Spark Integration Setup
+
+This guide details how to set up the Apache Iceberg runtime JAR for use with Apache Spark.
+
+## Prerequisites
+
+- Apache Spark installed in `/home/hadoop/spark`
+- Internet access to download dependencies
+- User with appropriate permissions (e.g., `hadoop`)
+
+## Installation Steps
+
+Open a terminal and run the following commands:
+
+### Step 1: Download the Iceberg Spark Runtime JAR
+```bash
+wget --no-check-certificate https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-spark-runtime-3.3_2.12/1.4.2/iceberg-spark-runtime-3.3_2.12-1.4.2.jar
+``` 
+
+### Step 2: Move the JAR file to Spark's JARs directory
+```bash
+mv iceberg-spark-runtime-3.3_2.12-1.4.2.jar /home/hadoop/spark/jars/
+```
+
+### Step 3: Set the correct file permissions
+```bash
+chmod 644 /home/hadoop/spark/jars/iceberg-spark-runtime-3.3_2.12-1.4.2.jar
+```
+
+### Step 4: Navigate to Spark binary directory (optional)
+```bash
+cd ~/spark/bin
+```
